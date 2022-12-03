@@ -19,6 +19,12 @@ variable "repo" {
   default     = "040code/blog-oidc-github-actions-aws"
 }
 
+variable "workflow" {
+  description = "Workflow allowed to run the deployment."
+  type        = string
+  default     = "040code/blog-oidc-github-actions-aws/.github/workflows/s3-template.yml@refs/heads/main"
+}
+
 variable "role" {
   type = object({
     name : string
