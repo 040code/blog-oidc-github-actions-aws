@@ -1,0 +1,31 @@
+name: Blog example S3 (part 1)
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions/blog
+          role-session-name: gh-actions
+          aws-region: eu-west-1
+
+      - name: deploy
+        run: |
+          npx cowsay -f ghostbusters "Running ${{ github.workflow }}" > message.txt
+          aws s3 cp message.txt s3://${{ github.repository_owner }}-${{ github.event.repository.name }}/${{ github.run_id }}.txt
+          rm message.txt
+
+      - name: check
+        run: |
+          aws s3 cp s3://${{ github.repository_owner }}-${{ github.event.repository.name }}/${{ github.run_id }}.txt result.txt
+          cat result.txt  
